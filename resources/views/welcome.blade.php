@@ -33,8 +33,8 @@
                       <label>Digite a pesquisa: </label>
                     </div>
                     <div class="col-md-5">
-                      <form action="#" method="GET">
-                        <input type="text" class="form-control" placeholder="Ex. CNPJ, UF, Descrição...">
+                      <form action="/notas" method="GET">
+                        <input type="text" id="search" name="search" class="form-control" placeholder="Procurar...">
                       </form>
                     </div>
                   </div>
