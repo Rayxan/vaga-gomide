@@ -18,7 +18,7 @@
                         @csrf
                         <div class="form-group d-flex justify-content-between col-md-12 align-items-center">
                             <div class="col-md-8" >
-                                <label class="text-left font-weight-bold">Selecione o Mês:</label>
+                              <label class="text-left font-weight-bold">Selecione o Mês:</label>
                             </div>
                             <div class="col-md-4 d-flex">
                             <input type="month" class="form-control" name="month" value="{{ session('month') }}">
@@ -30,11 +30,9 @@
                 </div>
                 <div class="card-body">
                   <div class="card-header row">
-                    <div class="">
-                      <label>Digite a pesquisa: </label>
-                    </div>
                     <div class="col-md-5">
                       <form action="/notas" method="GET">
+                        <label class="d-flex mb-1">Digite a pesquisa: </label>
                         <input type="text" id="search" name="search" class="form-control" placeholder="Procurar...">
                       </form>
                     </div>
@@ -64,42 +62,18 @@
                                   </thead>
                                   <tbody class="allData">
                                     @foreach ($notas as $nfe)
-                                    {{-- @php
-                                        dd($notas);
-                                    @endphp --}}
                                     <tr>
                                       <td> {{ $nfe->emitente }}</td>
                                       <td>{{ $nfe->serie ?? '1' }}</td>
                                       <td>{{ $nfe->UF }}</td>
                                       <td>{{ $nfe->n }}</td>
-                                      {{-- <td><b>{{ number_format($nfe->valor,2,',','.') }}</b></td> --}}
                                       <td><b>{{ $nfe->valor }}</b></td>
                                       <td>{{ $nfe->emissao }}</td>
                                       <td>{{ $nfe->mes_ano }}</td>
                                     </tr>
                                     @endforeach
                                   </tbody>
-
-                                    <tbody id="Content" class="searchData">
-                                      
-                                    </tbody>
-
-                                  {{-- <tfoot>
-                                    <tr>
-                                      <th>#</th>
-                                      <th width="1"></th>
-                                      <th>Emitente</th>
-                                      <th>Série</th>
-                                      <th>UF</th>
-                                      <th>Nº</th>
-                                      <th>Valor</th>
-                                      <th>Emissão</th>
-                                      <th>Status</th>
-                                      <th>Manifesto</th>
-                                      <th>Exportado</th>
-                                      <th>Recolhido</th>
-                                    </tr>
-                                  </tfoot> --}}
+                                    <tbody id="Content" class="searchData"></tbody>
                                 </table>
                         </div>
                     </div>
@@ -107,9 +81,7 @@
             </div>
         </center>
         <!-- JavaScript Bundle with Popper -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-        {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
-      
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>      
         <script type="text/javascript">
           $('#search').on('keyup', function(){
             $value=$(this).val();
@@ -136,36 +108,5 @@
             });
           })
         </script>
-
       </body>
 </html>
-
-<script>
-//   const search = document.querySelector('#searchInput');
-
-//   function searchInKeyUp(){
-//       console.log('search');
-//   }
-
-//   function searchInkeyUp() {
-//     console.log('search');
-// }
-
-//   search.addEventListener('keyup', searchInkeyUp());
-
-
-  // const search = document.getElementById('search');
-  // search.addEventListener('keyup', () => {
-  //       const valorCampo = search.value;
-  //       console.log(valorCampo); 
-  // });
-
-  // const search = document.getElementById('search');
-  // function searchInkeyUp() {
-  //   console.log('search');
-  // }
-  // search.addEventListener('keyup', _.debounce(searchInkeyUp, 400));
-
-
-
-</script>
