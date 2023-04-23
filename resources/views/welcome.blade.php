@@ -7,6 +7,7 @@
         <title>Teste Gomide</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
         <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+        <script src="https://code.jquery.com/jquery-3.6.4.min.js" integrity="sha256-oP6HI9z1XaZNBrJURtCoUT5SUnxFr8s3BzRl+cbzUq8=" crossorigin="anonymous"></script>
         
     </head>
     <body class="bg-secondary">
@@ -49,73 +50,24 @@
                                   <thead>
                                     @if ($notas)
                                     <tr>
-                                      <th></th>
-                                      <th width="1"></th>
                                       <th>Emitente</th>
                                       <th>Série</th>
                                       <th>UF</th>
                                       <th>Nº</th>
                                       <th>Valor</th>
                                       <th>Emissão</th>
+                                      <th>Mês/Ano</th>
                                     </tr>
                                     @else
                                     <td>Nenhum documento encontrado</td>
                                     @endif
                                   </thead>
-                                  <tbody>
+                                  <tbody class="allData">
                                     @foreach ($notas as $nfe)
                                     {{-- @php
                                         dd($notas);
                                     @endphp --}}
                                     <tr>
-                                      <td>
-                                        
-                                      </td>
-                                      <td>
-                                        <div class="actions" style="height: 44px;padding: 3px 5px; 
-                                        position:absolute;display:none; margin-top:20px">
-                                          <div class="text-center">
-                                            <input type="text" name="texto" class="texto" id="texto{{$nfe->id}}" style="position:relative; top:-800px;" readonly value="{{ $nfe->chave }}" />
-                                            <button class="btn btn-dark btn-sm btnCopiar" onclick="copiarTexto('{{$nfe->id}}');"><i class="fa fa-key"></i>
-                                              Chave NFe
-                                            </button>
-                                            @if ($nfe->xml != null)
-                                            <a href="#" target="_blank"><button type="button" class="btn btn-dark btn-sm statusAction actionView" onclick="setTimeout(() => {
-                                              window.location.reload();
-                                          }, 500);"><i class="fa-solid fa-file-pdf"></i>
-                                                Visualizar
-                                              </button></a>
-                                            <a href="#">
-                                              <button type="button" class="btn btn-dark btn-sm statusAction  actionDownload"><i class="fa fa-download"></i>
-                                                Download
-                                              </button></a>
-                                            @endif
-                                            <button type="button" class="btn btn-dark  btn-sm statusAction actionSendEmail" onclick="getId(this,'{{$nfe->id}}');"" data-toggle=" modal" data-target="#senMail{{$nfe->id}}">
-                                              <i class="fa-regular fa-paper-plane-top"></i>
-                                              Enviar e-mail
-                                            </button>
-                                            <a href="#">
-                                              <button type="button" class="btn btn-dark btn-sm statusAction actionManifest"><i class="fa fa-gavel"></i>
-                                                Manifestar
-                                              </button>
-                                            </a>
-                                            @if ($nfe->manifesto != null)
-                                            <button type="button" class="btn btn-dark btn-sm statusAction actionEventNote" data-toggle="modal" data-target="#modalEventos{{$nfe->id}}"><i class="fa fa-exchange"></i>
-                                              Eventos da nota
-                                            </button>
-                                            @endif
-                                            <!---->
-                                            <a href="#">
-                                              <button type="button" class="btn btn-dark btn-sm" onclick="getId(this,'{{$nfe->id}}');">
-                                                <i class="fa fa-refresh"></i> Status
-                                              </button>
-                                            </a>
-                                            <button type="button" class="btn btn-dark btn-sm " data-toggle="modal" data-target="#modalProtocolo{{$nfe->id}}"><i class="fa fa-list"></i>
-                                              Protocolo
-                                            </button>
-                                          </div>
-                                        </div>
-                                      </td>
                                       <td> {{ $nfe->emitente }}</td>
                                       <td>{{ $nfe->serie ?? '1' }}</td>
                                       <td>{{ $nfe->UF }}</td>
@@ -123,9 +75,15 @@
                                       {{-- <td><b>{{ number_format($nfe->valor,2,',','.') }}</b></td> --}}
                                       <td><b>{{ $nfe->valor }}</b></td>
                                       <td>{{ $nfe->emissao }}</td>
+                                      <td>{{ $nfe->mes_ano }}</td>
                                     </tr>
                                     @endforeach
                                   </tbody>
+
+                                    <tbody id="Content" class="searchData">
+                                      
+                                    </tbody>
+
                                   {{-- <tfoot>
                                     <tr>
                                       <th>#</th>
@@ -150,5 +108,64 @@
         </center>
         <!-- JavaScript Bundle with Popper -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
-    </body>
+        {{-- <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.21/lodash.min.js" integrity="sha512-WFN04846sdKMIP5LKNphMaWzU7YpMyCU245etK3g/2ARYbPK9Ub18eG+ljU96qKRCWh+quCY7yefSmlkQw1ANQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script> --}}
+      
+        <script type="text/javascript">
+          $('#search').on('keyup', function(){
+            $value=$(this).val();
+
+            if($value)
+            {
+              $('.allData').hide();
+              $('.searchData').show();
+            } else {
+              $('.allData').show();
+              $('.searchData').hide();
+            }
+
+            $.ajax({
+              type:'get',
+              url:'{{URL::to('search')}}',
+              data: {'search': $value},
+
+              success:function(data)
+              {
+                console.log(data);
+                $('#Content').html(data);
+              }
+            });
+          })
+        </script>
+
+      </body>
 </html>
+
+<script>
+//   const search = document.querySelector('#searchInput');
+
+//   function searchInKeyUp(){
+//       console.log('search');
+//   }
+
+//   function searchInkeyUp() {
+//     console.log('search');
+// }
+
+//   search.addEventListener('keyup', searchInkeyUp());
+
+
+  // const search = document.getElementById('search');
+  // search.addEventListener('keyup', () => {
+  //       const valorCampo = search.value;
+  //       console.log(valorCampo); 
+  // });
+
+  // const search = document.getElementById('search');
+  // function searchInkeyUp() {
+  //   console.log('search');
+  // }
+  // search.addEventListener('keyup', _.debounce(searchInkeyUp, 400));
+
+
+
+</script>

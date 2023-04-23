@@ -22,3 +22,5 @@ Route::get('/', function () {
 Route::get('/notas', [NotasController::class, 'index'])->name('notas');
 
 // Route::get('/notas',NotasController::class, 'index')->name('notas');
+
+Route::get('/search', [NotasController::class, 'search']);

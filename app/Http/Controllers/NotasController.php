@@ -9,37 +9,45 @@ use Illuminate\Support\Facades\DB;
 class NotasController extends Controller
 {
     public function index()
-    {
-
-        $search = request('search');
-        // dd($search);
-
-        if($search) {
-            $notas = Nota::where(function ($query) use ($search) {
-                $query->where('emitente', 'LIKE', "%$search%")
-                      ->orWhere('serie', 'LIKE', "%$search%")
-                      ->orWhere('UF', 'LIKE', "%$search%")
-                      ->orWhere('n', 'LIKE', "%$search%")
-                      ->orWhere('valor', 'LIKE', "%$search%")
-                      ->orWhere('emissao', 'LIKE', "%$search%")
-                      ->orWhere('mes_ano', 'LIKE', "%$search%");
-            })->get();
-
-        } else {
-            $notas = Nota::all();
-        }
-
+    {   
+        $notas = Nota::all();
+        
         return view(
             'welcome',
             [
                 'notas' => $notas,
-                'search' => $search,
             ]
         );
     }
 
-    public function search()
+    public function search(Request $request)
     {
-        # code...
+        $output = "";
+
+        $notas = Nota::where('emitente', 'LIKE', "%$request->search%")
+            ->orWhere('serie', 'LIKE', "%$request->search%")
+            ->orWhere('UF', 'LIKE', "%$request->search%")
+            ->orWhere('n', 'LIKE', "%$request->search%")
+            ->orWhere('valor', 'LIKE', "%$request->search%")
+            ->orWhere('emissao', 'LIKE', "%$request->search%")
+            ->orWhere('mes_ano', 'LIKE', "%$request->search%"
+            )->get();
+
+            foreach($notas as $nota)
+            {
+                $output.=                
+                
+                '<tr>
+                <td> '.$nota->emitente.' </td>
+                <td> '.$nota->serie.' </td>
+                <td> '.$nota->UF.' </td>
+                <td> '.$nota->n.' </td>
+                <td><b> '.$nota->valor.' </b></td>
+                <td> '.$nota->emissao.' </td>
+                <td> '.$nota->mes_ano.' </td>
+                </tr>';
+            }
+
+            return response($output);
     }
 }
