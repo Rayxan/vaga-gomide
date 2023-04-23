@@ -11,7 +11,16 @@ class NotasController extends Controller
     public function index()
     {   
         $notas = Nota::all();
-        
+
+        $search = request('month');
+        $mes_ano = date('m/Y', strtotime($search));
+
+        if($mes_ano && $search != null) {
+            $notas = Nota::where(function ($query) use ($mes_ano) {
+                $query->where('mes_ano', 'LIKE', "%$mes_ano%");
+            })->get();
+        }
+
         return view(
             'welcome',
             [
