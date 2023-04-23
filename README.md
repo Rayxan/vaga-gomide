@@ -1,64 +1,61 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+# Erros ou possíveis erros:
 
-## About Laravel
+* Quando rodei o comando: **php artisan migrate**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+SQLSTATE[HY000] [1045] Access denied for user ''@'localhost' (using password: NO) (SQL: select * from information_schema.tables 
+where table_schema = vaga-gomide and table_name = migrations and table_type = 'BASE TABLE')
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+	Tive que atribuir a palavra root em DB_USERNAME=root no arquivo .env 
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+* Quando rodei o novamente o comando: **php artisan migrate**
 
-## Learning Laravel
+SQLSTATE[42000]: Syntax error or access violation: 1071 Specified key was too long; max key length is 1000 bytes (SQL: alter table `users` add unique `users_email_unique`(`email`))
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+	Tive que adicionar a seguinte linha em /app/Providers/AppServiceProvider.php: 
+	Schema::defaultStringLength(191);
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+	Fonte: https://stackoverflow.com/questions/42244541/laravel-migration-error-syntax-error-or-access-violation-1071-specified-key-wa
 
-## Laravel Sponsors
+* Depois de rodar todas as migrations e a seed, quando acessei o projeto pelo navegador, me deparei com um erro de acesso a rota que foi resolvido mudando a forma que a rota estava sendo chamada (comparei com outros projetos em laravel que eu havia feito anteriormente e percebi o erro):
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
+	    Troquei: Route::get('/notas', [App\Http\Controllers\NotasController::class]);
+	    Por: Route::get('/notas', [NotasController::class, 'index']);
+	
+	    Já que no modelo antigo não informava qual método de NotasController era acessado através da rota especificada.
 
-### Premium Partners
+* Ao corrigir o erro anterior, me deparei com o seguinte:
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[OP.GG](https://op.gg)**
-- **[WebReinvent](https://webreinvent.com/?utm_source=laravel&utm_medium=github&utm_campaign=patreon-sponsors)**
-- **[Lendio](https://lendio.com)**
+SQLSTATE[42S02]: Base table or view not found: 1146 Table 'vaga-gomide.nfe' doesn't exist (SQL: select * from `nfe` where `mes_ano` = 04/2023 order by `dt` desc)
 
-## Contributing
+Resolvi trocando o nome da tabela que estava sendo acessada no método index de NotasController.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+	Troquei nfe por notas que é o nome da tabela que foi criada através das migrations.
 
-## Code of Conduct
+* Após corrigir o erro anterior, me deparei com:
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+SQLSTATE[42S22]: Column not found: 1054 Unknown column 'dt' in 'order clause' (SQL: select * from `notas` where `mes_ano` = 04/2023 order by `dt` desc)
 
-## Security Vulnerabilities
+    Consertei ele trocando na consulta o nome 'dt' que não é um atributo presente na table (portando o erro na consulta), por 'valor', um atributo presente na tabela de notas.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+* Ocorreu um erro indicando que o count deveria ser usado para countable or array, portanto retirei ele da condição e deixei só a variável que representava o objeto na condição, já que era uma condição simples que verificava se existia notas ou não.
 
-## License
+	    Substitui @if ($notas) > 0 
+	    Por @if ($notas)
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+* A maneira que as seeds estavam criadas, só criaria 1 registro, o primeiro no caso, tive que passar tudo dentro de um array e fazer um foreach;
+
+* Notei que haviam muitas informações desnecessárias na blade welcome, com isso mantive uma table simples sem essas informações que não estavam sendo usadas. Utilizei apenas os atributos que estavam sendo inseridos na migration da tabela notas;
+
+* E por final me restou criar lógica do campo de pesquisa de dados, um campo de pesquisa operando em tempo real, dinamicamente, e sem botão de envio de formulário.
+
+    Para isso, como no email que recebi divulgando a vaga estava escrito que as Tecnologias e ferramentas utilizadas no estágio seriam : PHP e Laravel, MySQL, JQuery, Bootstra. Levei em conta de acordo com minhas experiência anteriores que com certeza utilizam Ajax para fazer requisições assíncronas, portanto para fazer o campo de pesquisa dinâmico solicitado, utilizei JQuery e Ajax.
+
+* Notei ainda que a pesquisa por data no topo da tela não estava acontecendo, portanto corrigi.
+	
+	
+
+
+
+
+
